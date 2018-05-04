@@ -3,9 +3,7 @@ local gsoIsTeemo = false
 local gsoIsBlindedByTeemo = false
 local gsoLastAttackLocal = 0
 local gsoLastAttackServer = 0
-local gsoLastAttackServerSpell = 0
 local gsoLastMoveLocal = 0
-local gsoServerStart = 0
 local gsoMainMenu = nil
 local gsoMenu = nil
 local gsoDrawMenuMe = nil
@@ -30,17 +28,6 @@ local gsoOnPreMoveC = {}
 local gsoPostAttackBool = false
 local gsoAttackEnabled = true
 local gsoMovementEnabled = true
-local gsoNoAttacks = {
-    ["volleyattack"] = true,
-    ["volleyattackwithsound"] = true,
-    ["sivirwattackbounce"] = true,
-    ["asheqattacknoonhit"] = true
-}
-local gsoAttacks = {
-    ["caitlynheadshotmissile"] = true,
-    ["quinnwenhanced"] = true,
-    ["viktorqbuff"] = true
-}
 
 local function gsoGetAttackSpeed()
         return myHero.attackSpeed
@@ -494,17 +481,6 @@ class "__gsoOrbwalker"
                                 end
                         end
                 end
-                -- SPELL ATTACK TIME
-                local aSpell = myHero.activeSpell
-                if aSpell and aSpell.valid and aSpell.startTime > gsoServerStart then
-                        local aSpellName = aSpell.name:lower()
-                        if not gsoNoAttacks[aSpellName] and (aSpellName:find("attack") or gsoAttacks[aSpellName]) then
-                                gsoLastAttackServerSpell = Game.Timer()
-                                gsoServerStart = aSpell.startTime
-                                --[[gsoServerWindup = aSpell.windup
-                                gsoServerAnim = aSpell.animation--]]
-                        end
-                end
                 -- RESET ATTACK
                 if gsoLastAttackLocal > gsoLastAttackServer and Game.Timer() > gsoLastAttackLocal + 0.15 + _G.gsoSDK.Utilities:GetMaxLatency() then
                         if gsoMenu.enabled:Value() then
@@ -514,11 +490,6 @@ class "__gsoOrbwalker"
                 elseif gsoLastAttackLocal < gsoLastAttackServer and Game.Timer() < gsoLastAttackLocal + myHero.attackData.windUpTime and myHero.pathing.hasMovePath then
                         if gsoMenu.enabled:Value() then
                                 print("reset attack2")
-                        end
-                        gsoLastAttackLocal = 0
-                elseif gsoLastAttackLocal > gsoLastAttackServerSpell and Game.Timer() > gsoLastAttackLocal + myHero.attackData.windUpTime + 0.1 + _G.gsoSDK.Utilities:GetMaxLatency() then
-                        if gsoMenu.enabled:Value() then
-                                print("reset attack3")
                         end
                         gsoLastAttackLocal = 0
                 end

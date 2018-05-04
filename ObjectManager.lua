@@ -24,6 +24,14 @@ class "__gsoOB"
                 return false
         end
         
+        function __gsoOB:IsUnitValid_invisible(unit, range, bb)
+                local extraRange = bb and unit.boundingRadius or 0
+                if  unit.pos:DistanceTo(myHero.pos) < range + extraRange and not unit.dead and unit.isTargetable and unit.valid then
+                        return true
+                end
+                return false
+        end
+        
         function __gsoOB:IsHeroImmortal(unit, jaxE)
                 local hp = 100 * ( unit.health / unit.maxHealth )
                 if gsoUndyingBuffs["JaxCounterStrike"] ~= nil then gsoUndyingBuffs["JaxCounterStrike"] = jaxE end
@@ -70,6 +78,13 @@ class "__gsoOB"
                         for i = 1, Game.HeroCount() do
                                 local hero = Game.Hero(i)
                                 if hero and hero.team ~= myHero.team and self:IsUnitValid(hero, range, bb) then
+                                        result[#result+1] = hero
+                                end
+                        end
+                elseif state == "spell_invisible" then
+                        for i = 1, Game.HeroCount() do
+                                local hero = Game.Hero(i)
+                                if hero and hero.team ~= myHero.team and self:IsUnitValid_invisible(hero, range, bb) then
                                         result[#result+1] = hero
                                 end
                         end

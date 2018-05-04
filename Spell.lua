@@ -124,8 +124,14 @@ class "__gsoSpell"
                         self.spellDraw = { q = true, qr = 625 + 120, w = true, wr = 825, e = true, er = 900, r = true, rr = 1000 }
                 elseif myHero.charName == "Ivern" then
                         self.spellDraw = { q = true, qr = 1075, w = true, wr = 1000, e = true, er = 750 + 120 }
-                elseif myHero.charName == "Twitch" then
-                        self.spellDraw = { w = true, wr = 950, e = true, er = 1200, r = true, rf = function() return myHero.range + 300 + ( myHero.boundingRadius * 2 ) end }
+                elseif myHero.charName == "Janna" then
+                        self.spellDraw = { q = true, qf = function() local qt = Game.Timer() - gsoLastQk;if qt > 3 then return 1000 end local qrange = qt * 250;if qrange > 1750 then return 1750 end return qrange end, w = true, wr = 550 + 120, e = true, er = 800 + 120, r = true, rr = 725 }
+                elseif myHero.charName == "JarvanIV" then
+                        self.spellDraw = { q = true, qr = 770, w = true, wr = 625, e = true, er = 860, r = true, rr = 650 + 120 }
+                elseif myHero.charName == "Jax" then
+                        self.spellDraw = { q = true, qr = 700 + 120, e = true, er = 300, r = true }
+                elseif myHero.charName == "Jayce" then
+                        --self.spellDraw = { q = true, qr = 700 + 120, e = true, er = 300, r = true }  (Mercury Hammer: q=600+120, w=285, e=240+120; Mercury Cannon: q=1050/1470, w=active, e=650
                 elseif myHero.charName == "Jhin" then
                         self.spellDraw = { q = true, qr = 550 + 120, w = true, wr = 3000, e = true, er = 750, r = true, rr = 3500 }
                 elseif myHero.charName == "Jinx" then
@@ -140,6 +146,8 @@ class "__gsoSpell"
                         self.spellDraw = { q = true, qr = 1250, r = true, rr = 1000 }
                 elseif myHero.charName == "Teemo" then
                         self.spellDraw = { q = true, qr = 680, r = true, rf = function() local rLvl = myHero:GetSpellData(_R).level; if rLvl == 0 then rLvl = 1 end return 150 + ( 250 * rLvl ) end }
+                elseif myHero.charName == "Twitch" then
+                        self.spellDraw = { w = true, wr = 950, e = true, er = 1200, r = true, rf = function() return myHero.range + 300 + ( myHero.boundingRadius * 2 ) end }
                 elseif myHero.charName == "Tristana" then
                         self.spellDraw = { w = true, wr = 900 }
                 elseif myHero.charName == "Varus" then
@@ -211,6 +219,25 @@ class "__gsoSpell"
                 if Game.Timer() < gsoLastE + delays.e or Game.Timer() < gsoLastEk + delays.e then return false end
                 if Game.Timer() < gsoLastR + delays.r or Game.Timer() < gsoLastRk + delays.r then return false end
                 return true
+        end
+        
+        function __gsoSpell:CustomIsReady(spell, cd)
+                local passT
+                if spell == _Q then
+                        passT = Game.Timer() - gsoLastQk
+                elseif spell == _W then
+                        passT = Game.Timer() - gsoLastWk
+                elseif spell == _E then
+                        passT = Game.Timer() - gsoLastEk
+                elseif spell == _R then
+                        passT = Game.Timer() - gsoLastRk
+                end
+                local cdr = 1 - myHero.cdr
+                cd = cd * cdr
+                if passT - _G.gsoSDK.Utilities:GetMaxLatency() - 0.15 > cd then
+                      return true
+                end
+                return false
         end
         
         function __gsoSpell:IsReady(spell, delays)
